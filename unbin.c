@@ -4,7 +4,7 @@ unsigned char PSR_Magic[]="PSR-SLX";
 unsigned char SONG_Magic[]="SONG";
 unsigned char Style_Magic[]="STYLE";
 unsigned char Song_1[]="Overview";
-unsigned char Data_Magic[]="EvtD";
+unsigned char Data_Magic[]={0xff,0xff,'E','v','t','D',0};
 
 #define TRUE 1
 #define FALSE -1
@@ -64,6 +64,7 @@ int main(int argc,char *argv[])
 	size_t song_p, song_1, song_size, song_offset;
 	size_t style_p;
 	size_t data_p;
+	unsigned char filename[16];
 	int i;
 	
 	if(argc<2)
@@ -99,7 +100,7 @@ int main(int argc,char *argv[])
 	}
 	putchar('\n');
 	//Try to find Song-Parts
-	song_p = findParts(buffer, SONG_Magic, slx_p,size ,sizeof(SONG_Magic) - 1);
+	/*song_p = findParts(buffer, SONG_Magic, slx_p,size ,sizeof(SONG_Magic) - 1);
 	if(song_p == FALSE)
 	{
 		printf("Unable to locate SONG segment!\n");
@@ -123,13 +124,25 @@ int main(int argc,char *argv[])
 	{
 		printf("Unable to locate Song1 segment!\n");
 		exit(0);
-	}	
-	for(i=0;i<10;i++)
+	}	*/
+	data_p = findParts(buffer, Data_Magic, 0x202040,size ,sizeof(Data_Magic) - 1);
+	if(data_p == FALSE)
 	{
-		song_size = buffer[song_1 + i * 88 + 75] *0x10000 + buffer[song_1 + i * 88 + 76] *0x100 + buffer[song_1 + i * 88 + 77];
+		printf("Unable to locate Data segment!\n");
+		exit(0);
+	}
+	data_p+=2;
+	//printf("Find Song in offset %x, Style in offset %x, Data in offset %x\n",song_p,style_p,data_p);
+	//song_1 = 0x185040a;
+	
+	for(i=0;i<45;i++)
+	{
+		song_size = (buffer[data_p + 13 + 4 * i] *0x10000 + buffer[data_p + 14 + 4 * i] *0x100 + buffer[data_p + 15 + 4 * i]) - (buffer[data_p + 9 + 4 * i] *0x10000 + buffer[data_p + 10 + 4 * i] *0x100 + buffer[data_p + 11 + 4 * i]);
 		song_offset = data_p + buffer[data_p + 9 + 4 * i] *0x10000 + buffer[data_p + 10 + 4 * i] *0x100 + buffer[data_p + 11 + 4 * i];
-		printf("%s , size %d bytes, offset = %d\n",&buffer[song_1 + i * 88], song_size, song_offset);
-		writeBuffertoFile(&buffer[song_1 + i * 88],&buffer[song_offset],song_size);
+		if(i == 44) song_size=0x6d07;
+		sprintf(filename,"%d.mid",i);
+		printf("%s , size %x bytes, offset = 0x%x\n",filename, song_size, song_offset);
+		writeBuffertoFile(filename,&buffer[song_offset],song_size);
 	}
 	free(buffer);
 
