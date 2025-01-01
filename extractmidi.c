@@ -94,7 +94,27 @@ void dumpMIDI(uint8_t *buf, size_t offset, char *rec_name)
 }
 
 static int songno = 0;
-int fat = 0x1b40f6a - 88;
+//int fat = 0x1b40f6a - 88;
+
+char *find_songname_psre(uint8_t *buffer, int songno)
+{
+    int name_ofs = 0x54bbc;
+    char *ret = buffer + name_ofs;
+    
+    if(songno < 3)
+        return NULL;
+    songno -= 3;
+    printf("No = %d ",  songno);
+
+    while(songno > 0)
+    {
+        while(*++ret != 0);
+        while(*++ret == 0);
+        songno --;
+    }
+    printf("Song name =  %s\n", ret);
+    return ret;
+}
 
 int main(int argc, char *argv[])
 {
@@ -130,8 +150,10 @@ int main(int argc, char *argv[])
         if(memcmp(curptr, MIDI_Header, sizeof(MIDI_Header)) == 0)
         {
             printf("Found 'MThd' in %08x\n", curpos);
-            char *rec_name = &buffer[fat + 88 * songno];
-            dumpMIDI(curptr, curpos, rec_name);
+            //char *rec_name = &buffer[fat + 88 * songno];
+            char *rec_name = find_songname_psre(buffer, songno);
+            if (rec_name != NULL)
+                dumpMIDI(curptr, curpos, rec_name);
             songno ++;
         }
         curptr ++;
