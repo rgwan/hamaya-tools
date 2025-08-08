@@ -7,6 +7,8 @@ Hayama-Tools
 <p>mergebin - to combine PSR-S900 series ROM to one file.
 <p>c02.c - to extracts every segment that contained by Hayama Electone Voice file. And decrypt it(not done yet).
 <p>ppfc.c - to compile ppf file to legacy Hayama Keyboard 's YEP file
+<p>csvtobin.c - utility to convert DSView's CSV file to binary file
+<p>extractmidi.c - utility to extract midi file from romdumps
 <br>
 
 How to build on Linux

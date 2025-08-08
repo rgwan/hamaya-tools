@@ -12,7 +12,10 @@ OBJECTS_3 = mergebin.o
 TARGET_4 = c02$(EXE_SUFFIX)
 OBJECTS_4 = c02.o
 
-all:$(TARGET_1) $(TARGET_2) $(TARGET_3) $(TARGET_4)
+TARGET_5 = csvtobin$(EXE_SUFFIX)
+OBJECTS_5 = csvtobin.o
+
+all:$(TARGET_1) $(TARGET_2) $(TARGET_3) $(TARGET_4) $(TARGET_5)
 
 $(TARGET_1):$(OBJECTS_1)
 	$(CC) $(OBJECTS_1) -o $(TARGET_1)
@@ -26,6 +29,8 @@ $(TARGET_3):$(OBJECTS_3)
 $(TARGET_4):$(OBJECTS_4)
 	$(CC) $(OBJECTS_4) -o $(TARGET_4)
 	
+$(TARGET_5):$(OBJECTS_5)
+	$(CC) $(OBJECTS_5) -o $(TARGET_5)
 clean:
 	rm -f $(OBJECTS_1)
 	rm -f $(TARGET_1)
@@ -35,3 +40,7 @@ clean:
 	rm -f $(TARGET_3)
 	rm -f $(OBJECTS_4)
 	rm -f $(TARGET_4)
+	rm -f $(OBJECTS_5)
+	rm -f $(TARGET_5)
+
+.PHONY: clean all
